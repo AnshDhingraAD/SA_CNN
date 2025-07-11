@@ -14,7 +14,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import io
-import base64
+import base64 
 
 st.set_page_config(
     page_title="AI Sentiment Analysis for Whatsapp Privacy Policy 2021",
@@ -261,6 +261,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Initialize session state
 if 'history' not in st.session_state:
     st.session_state.history = []
 if 'model' not in st.session_state:
@@ -503,170 +504,169 @@ def create_sentiment_heatmap():
     
     return None
 
-def main():
-    # Header
-    st.markdown("""
-    <div class="main-header">
-        <h1 style="text-align: center; color: white; margin: 0; font-size: 3.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-            🎭 AI Sentiment Analysis for Whatsapp Policy 2021
-        </h1>
-        <p style="text-align: center; color: rgba(255,255,255,0.8); margin: 0.5rem 0 0 0; font-size: 1.3rem;">
-            Advanced Deep Learning CNN • Real-time Emotion Detection • Comprehensive Analytics
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+# Header - NOW AT THE TOP
+st.markdown("""
+<div class="main-header">
+    <h1 style="text-align: center; color: white; margin: 0; font-size: 3.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+        🎭 AI Sentiment Analysis for Whatsapp Privacy Policy 2021
+    </h1>
+    <p style="text-align: center; color: rgba(255,255,255,0.8); margin: 0.5rem 0 0 0; font-size: 1.3rem;">
+        Advanced Deep Learning CNN • Real-time Emotion Detection • Comprehensive Analytics
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+# Load model and tokenizer
+if st.session_state.model is None:
+    with st.spinner("🔄 Loading AI model..."):
+        st.session_state.model = load_model()
+        st.session_state.tokenizer = load_tokenizer()
+
+# Tabs
+tab1, tab2, tab3 = st.tabs(["🎯 Analysis", "📊 Advanced Analytics", "📈 Insights Dashboard"])
+
+# --- TAB 1: Analysis ---
+with tab1:
+    st.markdown("### 📝 Enter your opinion about the Whatsapp Privacy Policy 2021")
+    user_input = st.text_area(
+        "Type your message here...",
+        height=200,
+        placeholder="Share your thoughts, reviews...",
+        key="text_input"
+    )
     
-    # Load model and tokenizer
-    if st.session_state.model is None:
-        with st.spinner("🔄 Loading AI model..."):
-            st.session_state.model = load_model()
-            st.session_state.tokenizer = load_tokenizer()
-    
-    tab1, tab2, tab3 = st.tabs(["🎯 Analysis", "📊 Advanced Analytics", "📈 Insights Dashboard"])
-    
-    with tab1:
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            st.markdown("### 📝 Enter your opinion about the Whatsapp Privacy Policy 2021")
-            
-            # Text input
-            user_input = st.text_area(
-                "Type your message here...",
-                height=200,
-                placeholder="Share your thoughts, reviews, or any text you'd like to analyze...",
-                key="text_input"
-            )
-            
-            # Analysis button
-            if st.button("🔍 Analyze Sentiment", use_container_width=True):
-                if user_input.strip():
-                    with st.spinner("🤖 Analyzing sentiment..."):
-                        time.sleep(1)
-                        
-                        # Get prediction
-                        sentiment, confidence = predict_sentiment(
-                            user_input, 
-                            st.session_state.model, 
-                            st.session_state.tokenizer
-                        )
-                        
-                        # Get text statistics
-                        text_stats = analyze_text_stats(user_input)
-                        
-                        # Ad to history
-                        st.session_state.history.append({
-                            'text': user_input,
-                            'sentiment': sentiment,
-                            'confidence': confidence,
-                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                            'word_count': text_stats['word_count'],
-                            'char_count': text_stats['char_count']
-                        })
-                        
-                        # Display result
-                        sentiment_class = sentiment.lower() + '-sentiment'
-                        emoji = get_sentiment_emoji(sentiment)
-                        
-                        st.markdown(f"""
-                        <div class="sentiment-result {sentiment_class}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h3 style="color: white; margin: 0; font-size: 1.5rem;">
-                                    {emoji} Analysis Result
-                                </h3>
-                                <div style="font-size: 3rem; opacity: 0.8;">
-                                    {emoji}
+    if st.button("🔍 Analyze Sentiment", use_container_width=True):
+        if user_input.strip():
+            with st.spinner("🤖 Analyzing sentiment..."):
+                time.sleep(1)
+                sentiment, confidence = predict_sentiment(user_input, st.session_state.model, st.session_state.tokenizer)
+                text_stats = analyze_text_stats(user_input)
+                st.session_state.history.append({
+                    'text': user_input,
+                    'sentiment': sentiment,
+                    'confidence': confidence,
+                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'word_count': text_stats['word_count'],
+                    'char_count': text_stats['char_count']
+                })
+
+                sentiment_class = sentiment.lower() + '-sentiment'
+                emoji = get_sentiment_emoji(sentiment)
+
+                st.markdown(f"""
+                <div class="sentiment-result {sentiment_class}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: white; margin: 0; font-size: 1.5rem;">
+                            {emoji} Analysis Result
+                        </h3>
+                        <div style="font-size: 3rem; opacity: 0.8;">
+                            {emoji}
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;">
+                        <div>
+                            <h2 style="color: white; margin: 0; font-size: 2.5rem; font-weight: 700;">
+                                {sentiment}
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.8); margin: 0.5rem 0; font-size: 1.2rem;">
+                                Confidence: {confidence:.2%}
+                            </p>
+                        </div>
+                        <div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                                <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
+                                    <div style="color: white; font-weight: 600;">{text_stats['word_count']}</div>
+                                    <div style="color: rgba(255,255,255,0.7);">Words</div>
                                 </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;">
-                                <div>
-                                    <h2 style="color: white; margin: 0; font-size: 2.5rem; font-weight: 700;">
-                                        {sentiment}
-                                    </h2>
-                                    <p style="color: rgba(255,255,255,0.8); margin: 0.5rem 0; font-size: 1.2rem;">
-                                        Confidence: {confidence:.2%}
-                                    </p>
+                                <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
+                                    <div style="color: white; font-weight: 600;">{text_stats['char_count']}</div>
+                                    <div style="color: rgba(255,255,255,0.7);">Characters</div>
                                 </div>
-                                <div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
-                                        <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
-                                            <div style="color: white; font-weight: 600;">{text_stats['word_count']}</div>
-                                            <div style="color: rgba(255,255,255,0.7);">Words</div>
-                                        </div>
-                                        <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
-                                            <div style="color: white; font-weight: 600;">{text_stats['char_count']}</div>
-                                            <div style="color: rgba(255,255,255,0.7);">Characters</div>
-                                        </div>
-                                        <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
-                                            <div style="color: white; font-weight: 600;">{text_stats['sentence_count']}</div>
-                                            <div style="color: rgba(255,255,255,0.7);">Sentences</div>
-                                        </div>
-                                        <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
-                                            <div style="color: white; font-weight: 600;">{text_stats['avg_word_length']:.1f}</div>
-                                            <div style="color: rgba(255,255,255,0.7);">Avg Word Len</div>
-                                        </div>
-                                    </div>
+                                <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
+                                    <div style="color: white; font-weight: 600;">{text_stats['sentence_count']}</div>
+                                    <div style="color: rgba(255,255,255,0.7);">Sentences</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; text-align: center;">
+                                    <div style="color: white; font-weight: 600;">{text_stats['avg_word_length']:.1f}</div>
+                                    <div style="color: rgba(255,255,255,0.7);">Avg Word Len</div>
                                 </div>
                             </div>
                         </div>
-                        """, unsafe_allow_html=True)
-                        
-                        # Enhanced confidence meter
-                        fig_gauge = go.Figure(go.Indicator(
-                            mode = "gauge+number+delta",
-                            value = confidence * 100,
-                            domain = {'x': [0, 1], 'y': [0, 1]},
-                            title = {'text': f"Confidence Level - {sentiment}", 'font': {'color': 'white', 'size': 18}},
-                            delta = {'reference': 70},
-                            gauge = {
-                                'axis': {'range': [None, 100], 'tickcolor': 'white', 'tickfont': {'color': 'white'}},
-                                'bar': {'color': get_sentiment_color(sentiment), 'thickness': 0.3},
-                                'bgcolor': "rgba(0,0,0,0.2)",
-                                'borderwidth': 2,
-                                'bordercolor': "white",
-                                'steps': [
-                                    {'range': [0, 50], 'color': 'rgba(255,255,255,0.1)'},
-                                    {'range': [50, 80], 'color': 'rgba(255,255,255,0.2)'},
-                                    {'range': [80, 100], 'color': 'rgba(255,255,255,0.3)'}
-                                ],
-                                'threshold': {
-                                    'line': {'color': "white", 'width': 4},
-                                    'thickness': 0.75,
-                                    'value': 90
-                                }
-                            }
-                        ))
-                        
-                        fig_gauge.update_layout(
-                            paper_bgcolor="rgba(0,0,0,0)",
-                            plot_bgcolor="rgba(0,0,0,0)",
-                            font={'color': 'white'},
-                            height=350
-                        )
-                        
-                        st.plotly_chart(fig_gauge, use_container_width=True)
-                        
-                else:
-                    st.warning("⚠️ Please enter some text to analyze!")
-        
-        with col2:
-            st.markdown("### 📊 Quick Stats")
-            
-            if st.session_state.history:
-                total_analyses = len(st.session_state.history)
-                sentiment_counts = pd.Series([item['sentiment'] for item in st.session_state.history]).value_counts()
-                avg_confidence = np.mean([item['confidence'] for item in st.session_state.history])
-                
-                # Stats grid
-                st.markdown(f"""
-                <div class="stats-grid">
-                    <div class="metric-card">
-                        <h3 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 700;">{total_analyses}</h3>
-                        <p style="color: rgba(255,255,255,0.8); margin: 0;">Total Analyses</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 700;">{avg_confidence:.1%}</h3>
-                        <p style="color: rgba(255,255,255,0.8); margin: 0;">Avg Confidence</p>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+
+            fig_gauge = go.Figure(go.Indicator(
+                mode="gauge+number+delta",
+                value=confidence * 100,
+                domain={'x': [0, 1], 'y': [0, 1]},
+                delta={'reference': 70},
+                gauge={
+                    'axis': {'range': [None, 100], 'tickcolor': 'white', 'tickfont': {'color': 'white'}},
+                    'bar': {'color': get_sentiment_color(sentiment), 'thickness': 0.3},
+                    'bgcolor': "rgba(0,0,0,0.2)",
+                    'borderwidth': 2,
+                    'bordercolor': "white",
+                    'steps': [
+                        {'range': [0, 50], 'color': 'rgba(255,255,255,0.1)'},
+                        {'range': [50, 80], 'color': 'rgba(255,255,255,0.2)'},
+                        {'range': [80, 100], 'color': 'rgba(255,255,255,0.3)'}
+                    ],
+                    'threshold': {
+                        'line': {'color': "white", 'width': 4},
+                        'thickness': 0.75,
+                        'value': 90
+                    }
+                }
+            ))
+
+            fig_gauge.update_layout(
+                title={
+                    'text': f"Confidence Level - {sentiment}",
+                    'font': {'color': 'white', 'size': 22},
+                    'x': 0.5
+                },
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font={'color': 'white'},
+                height=350
+            )
+
+            st.plotly_chart(fig_gauge, use_container_width=True)
+
+        else:
+            st.warning("⚠️ Please enter some text to analyze!")
+
+# --- TAB 2: Advanced Analytics ---
+with tab2:
+    st.markdown("## 📊 Advanced Analytics")
+
+    timeline_fig = create_sentiment_timeline()
+    conf_fig = create_confidence_distribution()
+
+    if timeline_fig:
+        st.plotly_chart(timeline_fig, use_container_width=True)
+    else:
+        st.info("Not enough data to show timeline.")
+
+    if conf_fig:
+        st.plotly_chart(conf_fig, use_container_width=True)
+    else:
+        st.info("Not enough data to show confidence distribution.")
+
+# --- TAB 3: Insights Dashboard ---
+with tab3:
+    st.markdown("## 📈 Insights Dashboard")
+
+    word_fig, words = create_word_analysis()
+    heatmap_fig = create_sentiment_heatmap()
+
+    if word_fig:
+        st.plotly_chart(word_fig, use_container_width=True)
+    else:
+        st.info("No text history to create word frequency chart.")
+
+    if heatmap_fig:
+        st.plotly_chart(heatmap_fig, use_container_width=True)
+    else:
+        st.info("Not enough data for sentiment heatmap.")
