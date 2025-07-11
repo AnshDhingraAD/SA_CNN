@@ -271,13 +271,13 @@ if 'tokenizer' not in st.session_state:
 
 @st.cache_resource
 def load_model():
-    model=tf.keras.models.load_model(r'C:\Users\DELL\OneDrive\Desktop\SA_CNN\model\sentiment_model_final_2.keras')
+    model=tf.keras.models.load_model(r'model\sentiment_model_final_2.keras')
     return model
 
 @st.cache_resource
 def load_tokenizer():
     import pickle
-    with open(r'C:\Users\DELL\OneDrive\Desktop\SA_CNN\model\tokenizer.pkl', 'rb') as handle:
+    with open(r'model\tokenizer.pkl', 'rb') as handle:
         tokenizer = pickle.load(handle)
     return tokenizer
 
